@@ -50,11 +50,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nitesh9001/nested-select"
+    "url": "https://github.com/furkansaglaam/tree-select"
   },
-  "homepage": "https://github.com/nitesh9001/nested-select/blob/main/README.md",
+  "homepage": "https://github.com/furkansaglaam/tree-select",
   "bugs": {
-    "url": "https://github.com/nitesh9001/nested-select/issues"
+    "url": "https://github.com/furkansaglaam/tree-select/issues"
   },
   "peerDependencies": {
     "react": "*"
