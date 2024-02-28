@@ -1,5 +1,5 @@
+// @ts-ignore
 import React, { useState, useRef, useEffect } from 'react';
-const { Countries } = require('../Utils/db_country_state.js');
 import ActionButton from '../Elements/ActionButton';
 import { moduleProps } from '../typings';
 import './SelectModule.css';
@@ -9,46 +9,46 @@ import Arrow from '../assets/downarrow.svg';
 import search from '../assets/search.svg';
 // @ts-ignore
 import Close from '../assets/close.svg';
+const { data } = require('../Utils/db_country_state.js');
 
 const NestedSelect = ({
-    buttonContent,
-    selectedValue,
-    showCustomList,
-    selectLimit,
-    trailing,
-    trailingIcon,
-    leading,
-    state,
-    continent,
-    width,
-    enableButton,
-    height,
-    placeholderCtx,
-    chip,
-    chipCount,
-    expandChip,
-    omitSelected,
-    inputClass,
-    dropDownClass,
-    buttonClass,
-    error,
-    helperText,
-    disable,
-    selectAllOption,
-    callback,
-    onChange,
-    onSearch,
-    onViewmore,
-    onChipDelete,
-    ...props
-}: moduleProps) => {
+                          buttonContent,
+                          selectedValue,
+                          showCustomList,
+                          selectLimit,
+                          trailing,
+                          trailingIcon,
+                          leading,
+                          state,
+                          width,
+                          enableButton,
+                          height,
+                          placeholderCtx,
+                          chip,
+                          chipCount,
+                          expandChip,
+                          omitSelected,
+                          inputClass,
+                          dropDownClass,
+                          buttonClass,
+                          error,
+                          helperText,
+                          disable,
+                          selectAllOption,
+                          callback,
+                          onChange,
+                          onSearch,
+                          onViewmore,
+                          onChipDelete,
+                          ...props
+                      }: moduleProps) => {
 
     const [expandCountry, setExpandCountry] = useState<null | number>(null);
     const [openDropDown, setopenDropDown] = useState<boolean>(false);
     const [showTrailing, setShowTrailing] = useState<boolean>(true);
     const [showButtonComponent, setShowButtonComponent] = useState<boolean>(true);
     const [showState, setShowState] = useState<boolean>(true);
-    const [showContinent, setShowContinent] = useState<boolean>(false);
+    const [showContinent, setShowContinent] = useState<boolean>(true);
     const [searchValue, setsearchValue] = useState<string>("");
     const [checkedValues, setcheckedValues] = useState<any>([]);
     const [savedVales, setSavedValues] = useState<any>([]);
@@ -66,15 +66,15 @@ const NestedSelect = ({
     const [toggleView, setToggleView] = useState<boolean>(false);
     const [allOptionSelectable, setSelectAllOptions] = useState<boolean>(false);
     const [selectAllRegions, setselectAllRegions] = useState<boolean>(false);
-    
+
     var dataFor: any | undefined;
     const ref = useRef<null | any>(null);
 
     useEffect(() => {
-        selectedValue.map((country:any )=> {
-            delete country.disabled;
-            if(country?.zones?.length > 0){
-                country.zones.map((zone: any) => delete zone.disabled)
+        selectedValue.map((item:any )=> {
+            delete item.disabled;
+            if(item?.subData?.length > 0){
+                item.subData.map((zone: any) => delete zone.disabled)
             }
         });
         setSelectItemLimit(selectLimit ?? -1);
@@ -87,9 +87,6 @@ const NestedSelect = ({
         }
         if (enableButton !== undefined) {
             setShowButtonComponent(enableButton);
-        }
-        if (continent !== undefined) {
-            setShowContinent(continent);
         }
         if (state !== undefined) {
             setShowState(state);
@@ -202,8 +199,8 @@ const NestedSelect = ({
             let dataFinals = JSON.parse(JSON.stringify(value))
             const dataFinal = dataFinals.filter((d: any) => d?.disabled !== true);
             dataFinal.forEach((d: any) =>  {
-                if( d.zones?.length > 0){
-                    d.zones = d?.zones.filter((it: any) => it?.disabled !== true);
+                if( d.subData?.length > 0){
+                    d.subData = d?.subData.filter((it: any) => it?.disabled !== true);
                 }
             });
             setcheckedValues([...dataFinal]);
@@ -220,20 +217,20 @@ const NestedSelect = ({
         setselectAllRegions(false)
         var array: any | undefined = [];
         if (findInselected(c_data, false)[0]) {
-            array = checkedValues.filter((item: any) => item.code !== c_data.code)
+            array = checkedValues.filter((item: any) => item.value !== c_data.value)
         } else {
             if (e.target.checked || !e.target.dataset.checked) {
                 if (checkedValues.length !== 0) {
                     checkedValues?.forEach((element: any) => {
-                        if (element.code === c_data.code) {
-                            element.zones = [...c_data.zones]
+                        if (element.value === c_data.value) {
+                            element.subData = [...c_data.subData]
                             array = [...checkedValues]
                         } else {
                             const option = {
                                 name: c_data.name,
-                                code: c_data.code,
-                                zones: c_data.zones,
-                                count: c_data.zones?.length,
+                                value: c_data.value,
+                                subData: c_data.subData,
+                                count: c_data.subData?.length,
                                 ...c_data
                             }
                             array = [...checkedValues, option]
@@ -242,37 +239,37 @@ const NestedSelect = ({
                 } else {
                     const option = {
                         name: c_data.name,
-                        code: c_data.code,
-                        zones: c_data.zones,
-                        count: c_data.zones?.length,
+                        value: c_data.value,
+                        subData: c_data.subData,
+                        count: c_data.subData?.length,
                         ...c_data
                     }
                     array = [...checkedValues, option]
                 }
             } else {
-                array = checkedValues.filter((item: any) => item.code !== c_data.code)
+                array = checkedValues.filter((item: any) => item.value !== c_data.value)
             }
         }
-        excludeDisabled(array);  
+        excludeDisabled(array);
     }
 
     const selecttheState = (e: any, c_data: any, s_state: any, n: number, m: number) => {
         setselectAllRegions(!selectAllRegions)
         var array: any | undefined = [];
-        if (findInselectedarray(c_data.code, s_state.code, false)[0]) {
+        if (findInselectedarray(c_data.value, s_state.value, false)[0]) {
             var count = 0;
             checkedValues?.forEach((element: any, sd: number) => {
-                if (element.code === c_data.code) {
+                if (element.value === c_data.value) {
                     var finalResult;
                     var counrtyFilter;
-                    var state_present = element.zones.some((item: any) => item.code === s_state.code);
+                    var state_present = element.subData.some((item: any) => item.value === s_state.value);
                     if (state_present) {
-                        finalResult = element.zones.filter((ele: any) => ele.code !== s_state.code);
-                        element.zones = finalResult;
+                        finalResult = element.subData.filter((ele: any) => ele.value !== s_state.value);
+                        element.subData = finalResult;
                         if (!(finalResult?.length > 0))
-                            counrtyFilter = checkedValues.filter((d: any) => element?.code !== d.code);
+                            counrtyFilter = checkedValues.filter((d: any) => element?.value !== d.value);
                     } else {
-                        element.zones = [...element.zones, s_state]
+                        element.subData = [...element.subData, s_state]
                     }
                     array = counrtyFilter?.length > 0 ? [...counrtyFilter] : [...checkedValues];
                     // array = [...checkedValues];
@@ -282,9 +279,9 @@ const NestedSelect = ({
                         const option = {
                             ...c_data,
                             name: c_data.name,
-                            code: c_data.code,
-                            count: c_data.zones?.length,
-                            zones: [s_state]
+                            value: c_data.value,
+                            count: c_data.subData?.length,
+                            subData: [s_state]
                         }
                         array = [...checkedValues, option];
                         count = count + 1;
@@ -296,26 +293,26 @@ const NestedSelect = ({
                 const option = {
                     ...c_data,
                     name: c_data.name,
-                    code: c_data.code,
-                    count: c_data.zones?.length,
-                    zones: [s_state],
+                    value: c_data.value,
+                    count: c_data.subData?.length,
+                    subData: [s_state],
                 }
                 array = [...checkedValues, option]
             } else {
                 var count = 0;
                 checkedValues?.forEach((element: any, sd: number) => {
-                    if (element.code === c_data.code) {
+                    if (element.value === c_data.value) {
                         var finalResult;
                         var counrtyFilter;
-                        var state_present = element.zones.some((item: any) => item.code === s_state.code);
+                        var state_present = element.subData.some((item: any) => item.value === s_state.value);
                         if (state_present) {
-                            finalResult = element.zones.filter((ele: any) => ele.code !== s_state.code);
-                            element.zones = finalResult;
+                            finalResult = element.subData.filter((ele: any) => ele.value !== s_state.value);
+                            element.subData = finalResult;
                             if (!(finalResult?.length > 0))
-                                counrtyFilter = checkedValues.filter((d: any) => element?.code !== d.code);
+                                counrtyFilter = checkedValues.filter((d: any) => element?.value !== d.value);
 
                         } else {
-                            element.zones = [...element.zones, s_state]
+                            element.subData = [...element.subData, s_state]
                         }
                         array = counrtyFilter?.length > 0 ? [...counrtyFilter] : [...checkedValues];
                         // array = [...checkedValues];
@@ -325,9 +322,9 @@ const NestedSelect = ({
                             const option = {
                                 ...c_data,
                                 name: c_data.name,
-                                code: c_data.code,
-                                count: c_data.zones?.length,
-                                zones: [s_state]
+                                value: c_data.value,
+                                count: c_data.subData?.length,
+                                subData: [s_state]
                             }
                             array = [...checkedValues, option];
                             count = count + 1;
@@ -335,7 +332,7 @@ const NestedSelect = ({
                     }
                 })
             }
-        } 
+        }
         excludeDisabled(array);
     }
 
@@ -346,20 +343,20 @@ const NestedSelect = ({
             dataFor = [];
             onChangeComp();
         }else{
-            excludeDisabled(Countries(showCustomList, showContinent))
+            //excludeDisabled(data(showCustomList, showContinent))
         }
     }
 
     const findInselectedarray = (country_code: string, state_code: string, isDisabled:boolean ) => {
         let result = [false];
         checkedValues.some((element: any) => {
-            if (element.code === country_code) {
-                element.zones.some((e: any) => {
-                    if(isDisabled && isDisabled == true && state_code == e.code){
-                       e.disabled = isDisabled
+            if (element.value === country_code) {
+                element.subData.some((e: any) => {
+                    if(isDisabled && isDisabled == true && state_code == e.value){
+                        e.disabled = isDisabled
                     }
                     // if(e?.disabled == true) result[1] = true;//@@
-                    return result[0] = e.code == state_code ? true : false
+                    return result[0] = e.value == state_code ? true : false
                 });
             }
         });
@@ -369,12 +366,12 @@ const NestedSelect = ({
     const findInselected = (country_data: any, isDisabled: boolean) => {
         var result = [false];
         checkedValues.forEach((element: any) => {
-            if (element.code === country_data.code) {
+            if (element.value === country_data.value) {
                 if(isDisabled && isDisabled== true){
                     element.disabled = isDisabled
                 }
-                if(element?.zones?.length === country_data?.zones?.length){
-                    result[0] = element?.zones?.length === country_data?.zones?.length;
+                if(element?.subData?.length === country_data?.subData?.length){
+                    result[0] = element?.subData?.length === country_data?.subData?.length;
                     // if(element?.disabled){ //@@
                     //     result.push(true);
                     // }else{//@@
@@ -391,8 +388,8 @@ const NestedSelect = ({
     const selectedCount = (code: string) => {
         var result = 0;
         checkedValues.forEach((ele: any) => {
-            if (ele.code === code) {
-                result = ele.zones?.length
+            if (ele.value === code) {
+                result = ele.subData?.length
             }
         });
         return result
@@ -408,7 +405,7 @@ const NestedSelect = ({
         var strings: string = "";
         if (ctx) {
             checkedValues?.map((d: any) => {
-                var s: string = d.zones.length > 0 ? `(${d.count} of ${d.zones.length} ${d?.provinceKey?.toLowerCase()}),` : ","
+                var s: string = d.subData.length > 0 ? `(${d.count} of ${d.subData.length}),` : ","
                 strings = `${strings} ${d?.name}${s}`
             });
         }
@@ -419,7 +416,7 @@ const NestedSelect = ({
         if (onChipDelete) {
             onChipDelete(obj);
         }
-        var array = checkedValues.filter((item: any) => item.code !== obj.code);
+        var array = checkedValues.filter((item: any) => item.value !== obj.value);
         setcheckedValues(array);
         dataFor = array;
     }
@@ -431,12 +428,12 @@ const NestedSelect = ({
                         <div className="NSI-main-overlap-nested">
                             {checkedValues?.map((item: any, i: number) => i < chipNoCount && <span className="NSI-main-chipicons-label">
                                 {item.name}
-                                {item.zones.length > 0 &&
-                                    <>
-                                        ({item.zones.length} of {item.zones.length ?? "1"} {item?.provinceKey?.toLowerCase()})
-                                    </>
-                                } {" "}
-                                <img src={Close} style={{ width: 8, marginLeft: 4, cursor: "pointer" }} onClick={() => chipDelete(item)} />
+                                    {item.subData.length > 0 &&
+                                        <>
+                                            ({item.subData.length} of {item.subData.length ?? "1"})
+                                        </>
+                                    } {" "}
+                                    <img src={Close} style={{ width: 8, marginLeft: 4, cursor: "pointer" }} onClick={() => chipDelete(item)} />
                             </span>
                             )}
                             {(checkedValues?.length > chipNoCount) && <span className="NSI-main-more-trailing" onClick={() => {
@@ -457,35 +454,15 @@ const NestedSelect = ({
                     }
                 </div>
                 }
-                <div className='NSI-main-input-flex-box'>
-                    {isLeading && <img src={search} alt="" className='NSI-select-input-leading' />}
-                    <input
-                        type="text"
-                        value={isLoading ? getValue(placeholder) : searchValue}
-                        placeholder='Select Area'
-                        className='NSI-input-box'
-                        onFocus={(e: any) => {
-                            setIsExpand(true);
-                            setopenDropDown(true);
-                            setIsloading(false);
-                        }}
-                        onChange={(e: any) => searchCountiresorState(e)}
-                        // eslint-disable-next-line react/jsx-props-no-spreading
-                        {...props}
-                    />
-                    {isTrailing && <img src={Arrow} alt="" className={isExpand ? 'NSI-select-input-trailing' : 'NSI-select-input-trailing-180'} onClick={() => {
-                        setIsExpand(!isExpand);
-                        setopenDropDown(!openDropDown);
-                    }} />}
-                </div>
+
             </div>
             {helperText && <p className={error ? 'NSI-main-input-helper-text NSI-error-text' : 'NSI-main-input-helper-text'}>{helperText}</p>}
             <div style={{ paddingTop: 5 }} onChange={() => onChangeComp()}>
                 {openDropDown &&
                     <div className={`${dropDownClass} NSI-select-drop-down-menu-wrapper`} >
                         {showContinent == true ? <>
-                            <div className='NSI-select-drop-down-menu-itembox' id="NSI-select-drop-down-menu-itembox" style={{ height: height }}>
-                                {/* {allOptionSelectable == true && <div>
+                                <div className='NSI-select-drop-down-menu-itembox' id="NSI-select-drop-down-menu-itembox" style={{ height: height }}>
+                                    {/* {allOptionSelectable == true && <div>
                                         <li className='NSI-select-menuitem-list' onClick={(e: any) => {
                                                 setselectAllRegions(!selectAllRegions);
                                                 selectAllCountryState(e, !selectAllRegions, showContinent);
@@ -505,94 +482,76 @@ const NestedSelect = ({
                                             </div>
                                         </li>
                                     </div>} */}
-                                {Countries(showCustomList, showContinent).map((conti_data: any, index: number) =>
-                                    <div key={index}>
-                                        {showContinent && <div className='NSI-continent-listitem' id={conti_data.name?.toLowerCase()} key={index}>
-                                            <li className='NSI-continent-text'>
-                                                {conti_data?.name}
-                                            </li>
-                                        </div>
-                                        }
-                                        {conti_data?.countries.map((c_data: any, i: number) =>
-                                            <div key={i} className={expandCountry === i ? "NSI-select-drop-down-menu-expanded" : ""} data-id={i} style={c_data?.disabled ? { background: "#cccccc79" } : {}}>
-                                                <li className='NSI-select-menuitem-list' id={c_data.name?.toLowerCase()} onClick={(e: any) => {
-                                                    if(!(c_data?.disabled && c_data?.disabled == true)) selecttheCountry(e, c_data)
-                                                    }}>
-                                                    <div className='NSI-select-menuitem-leading'>
-                                                        <input
-                                                            type="checkbox"
-                                                            className='NSI-select-menuitem-checkbox'
-                                                            checked={findInselected(c_data, c_data?.disabled)[0]}
-                                                            disabled={disableSelectBox || c_data?.disabled}
-                                                            onChange={() => { }}
-                                                        // onChange={(e: any) => selecttheCountry(e, c_data)}
-                                                        />
-                                                        <div>{c_data.name}</div>
-                                                    </div>
-                                                    {(c_data?.zones?.length > 0 && showState) && <div className='NSI-select-menuitem-trailing'>
-                                                        {showTrailing && <span className='NSI-select-menuitem-trailing-text'>{selectedCount(c_data.code)} of {c_data?.zones?.length} {c_data?.provinceKey?.toLowerCase()}</span>}
-                                                        <img src={Arrow} className={expandCountry === i ? "NSI-select-arrow-collapse-svg" : "NSI-select-arrow-expand-svg"} onClick={(e: any) => {
-                                                            openShow(e, i);
-                                                            e.stopPropagation();
-                                                            e.nativeEvent.stopImmediatePropagation();
-                                                        }} />
-                                                    </div>
-                                                    }
+                                    {data.map((conti_data: any, index: number) =>
+                                        <div key={index}>
+                                            {showContinent && <div className='NSI-continent-listitem' id={conti_data.name?.toLowerCase()} key={index}>
+                                                <li className='NSI-continent-text'>
+                                                    {conti_data?.name}
                                                 </li>
-                                                {showState && expandCountry === i && c_data.zones.length > 0 &&
-                                                    c_data.zones.map((item: any, k: number) =>
-                                                        <li className='NSI-select-menuitem-list inner-list' onClick={(e: any) => {
-                                                            if(!(item?.disabled && item?.disabled == true)) selecttheState(e, c_data, item, k, index)
-                                                            }} key={k} id={item.name?.toLowerCase()} data-id={i} style={item?.disabled ? { background: "#cccccc79" } : {}}>
-                                                            <div className='NSI-select-menuitem-leading'>
-                                                                <input
-                                                                    type="checkbox"
-                                                                    onChange={() => { }}
-                                                                    // onChange={(e: any) => selecttheState(e, c_data, item, k, i)}
-                                                                    checked={findInselectedarray(c_data.code, item.code, item?.disabled )[0] }
-                                                                    className='NSI-select-menuitem-checkbox'
-                                                                    disabled={item?.disabled}
-                                                                /><div>{item.name}</div>
-                                                            </div>
-                                                            <div>
-                                                            </div>
-                                                        </li>
-                                                    )}
                                             </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                            {showButtonComponent &&
-                                <>
-                                    <hr className='NSI-select-drop-down-menu-seperation' />
-                                    <ActionButton
-                                        value={savedVales}
-                                        setIsLoading={setIsloading}
-                                        setIsExpand={setIsExpand}
-                                        isExpand={isExpand}
-                                        disable={disable}
-                                        chipExpandView={chipExpandView}
-                                        chipCount={chipCount}
-                                        setChipNoCount={setChipNoCount}
-                                        callback={callback ? callback : () => { }}
-                                        buttonContent={buttonContent}
-                                        buttonClass={buttonClass}
-                                        closeDropDown={(val: any) => {
-                                            setopenDropDown(val);
-                                            setsearchValue("");
-                                        }}
-                                    />
-                                </>
-                            }
-                        </> :
+                                            }
+                                            {conti_data?.subData.map((c_data: any, i: number) =>
+                                                <div key={i} className={expandCountry === i ? "NSI-select-drop-down-menu-expanded" : ""} data-id={i} style={c_data?.disabled ? { background: "#cccccc79" } : {}}>
+                                                    <li className='NSI-select-menuitem-list' id={c_data.name?.toLowerCase()} onClick={(e: any) => {
+                                                        if(!(c_data?.disabled && c_data?.disabled == true)) selecttheCountry(e, c_data)
+                                                    }}>
+                                                        <div className='NSI-select-menuitem-leading'>
+                                                            <input
+                                                                type="checkbox"
+                                                                className='NSI-select-menuitem-checkbox'
+                                                                checked={findInselected(c_data, c_data?.disabled)[0]}
+                                                                disabled={disableSelectBox || c_data?.disabled}
+                                                                onChange={() => { }}
+                                                                // onChange={(e: any) => selecttheCountry(e, c_data)}
+                                                            />
+                                                            <div>{c_data.name}</div>
+                                                        </div>
+                                                        {(c_data?.subData?.length > 0 && showState) && <div className='NSI-select-menuitem-trailing'>
+                                                            {showTrailing && <span className='NSI-select-menuitem-trailing-text'>{selectedCount(c_data.value)} of {c_data?.subData?.length}</span>}
+                                                            <img src={Arrow} className={expandCountry === i ? "NSI-select-arrow-collapse-svg" : "NSI-select-arrow-expand-svg"} onClick={(e: any) => {
+                                                                openShow(e, i);
+                                                                e.stopPropagation();
+                                                                e.nativeEvent.stopImmediatePropagation();
+                                                            }} />
+                                                        </div>
+                                                        }
+                                                    </li>
+
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                                {showButtonComponent &&
+                                    <>
+                                        <hr className='NSI-select-drop-down-menu-seperation' />
+                                        <ActionButton
+                                            value={savedVales}
+                                            setIsLoading={setIsloading}
+                                            setIsExpand={setIsExpand}
+                                            isExpand={isExpand}
+                                            disable={disable}
+                                            chipExpandView={chipExpandView}
+                                            chipCount={chipCount}
+                                            setChipNoCount={setChipNoCount}
+                                            callback={callback ? callback : () => { }}
+                                            buttonContent={buttonContent}
+                                            buttonClass={buttonClass}
+                                            closeDropDown={(val: any) => {
+                                                setopenDropDown(val);
+                                                setsearchValue("");
+                                            }}
+                                        />
+                                    </>
+                                }
+                            </> :
                             <>
                                 <div className='NSI-select-drop-down-menu-itembox' id="NSI-select-drop-down-menu-itembox" style={{ height: height }}>
                                     {allOptionSelectable == true && <div>
                                         <li className='NSI-select-menuitem-list' onClick={(e: any) => {
-                                                setselectAllRegions(!selectAllRegions);
-                                                selectAllCountryState(e, !selectAllRegions, showContinent)
-                                            }}>
+                                            setselectAllRegions(!selectAllRegions);
+                                            selectAllCountryState(e, !selectAllRegions, showContinent)
+                                        }}>
                                             <div className='NSI-select-menuitem-leading'>
                                                 <input
                                                     type="checkbox"
@@ -600,7 +559,7 @@ const NestedSelect = ({
                                                     checked={selectAllRegions}
                                                     // disabled={c_data?.disabled}
                                                     onChange={(e : any) => {
-                                                        setselectAllRegions(!selectAllRegions); 
+                                                        setselectAllRegions(!selectAllRegions);
                                                         selectAllCountryState(e, !selectAllRegions, showContinent)
                                                     }}
                                                 />
@@ -608,13 +567,13 @@ const NestedSelect = ({
                                             </div>
                                         </li>
                                     </div>}
-                                    {Countries(showCustomList, showContinent).map((c_data: any, index: number) =>
+                                    {data(showCustomList, showContinent).map((c_data: any, index: number) =>
                                         <div key={index} className={expandCountry === index ? "NSI-select-drop-down-menu-expanded" : ""} data-id={index} style={c_data?.disabled ? { background: "#cccccc79" } : {}}>
                                             <li className='NSI-select-menuitem-list' id={c_data.name?.toLowerCase()} onClick={(e: any) => {
                                                 if(!(c_data?.disabled && c_data?.disabled == true)) {
                                                     selecttheCountry(e, c_data);
                                                 }
-                                                }}>
+                                            }}>
                                                 <div className='NSI-select-menuitem-leading'>
                                                     <input
                                                         type="checkbox"
@@ -622,12 +581,12 @@ const NestedSelect = ({
                                                         checked={findInselected(c_data, c_data?.disabled)[0]}
                                                         disabled={disableSelectBox || c_data?.disabled}
                                                         onChange={() => { }}
-                                                    // onChange={(e: any) => selecttheCountry(e, c_data)}
+                                                        // onChange={(e: any) => selecttheCountry(e, c_data)}
                                                     />
                                                     <div>{c_data.name}</div>
                                                 </div>
-                                                {(c_data?.zones?.length > 0 && showState) && <div className='NSI-select-menuitem-trailing'>
-                                                    {showTrailing && <span className='NSI-select-menuitem-trailing-text'>{selectedCount(c_data.code)} of {c_data?.zones?.length} {c_data?.provinceKey?.toLowerCase()}</span>}
+                                                {(c_data?.subData?.length > 0 && showState) && <div className='NSI-select-menuitem-trailing'>
+                                                    {showTrailing && <span className='NSI-select-menuitem-trailing-text'>{selectedCount(c_data.value)} of {c_data?.subData?.length}</span>}
                                                     <img src={Arrow} className={expandCountry === index ? "NSI-select-arrow-collapse-svg" : "NSI-select-arrow-expand-svg"} onClick={(e: any) => {
                                                         openShow(e, index);
                                                         e.stopPropagation();
@@ -636,17 +595,17 @@ const NestedSelect = ({
                                                 </div>
                                                 }
                                             </li>
-                                            {showState && expandCountry === index && c_data.zones.length > 0 &&
-                                                c_data.zones.map((item: any, k: number) =>
+                                            {showState && expandCountry === index && c_data.subData.length > 0 &&
+                                                c_data.subData.map((item: any, k: number) =>
                                                     <li className='NSI-select-menuitem-list inner-list' key={k} onClick={(e: any) => {
                                                         if(!(item?.disabled && item?.disabled == true)) selecttheState(e, c_data, item, k, index)
-                                                        }} id={item.name?.toLowerCase()} data-id={index} style={item?.disabled ? { background: "#cccccc79" } : {}}>
+                                                    }} id={item.name?.toLowerCase()} data-id={index} style={item?.disabled ? { background: "#cccccc79" } : {}}>
                                                         <div className='NSI-select-menuitem-leading'>
                                                             <input
                                                                 type="checkbox"
                                                                 onChange={() => { }}
                                                                 // onChange={(e: any) => selecttheState(e, c_data, item, k, index)}
-                                                                checked={findInselectedarray(c_data.code, item.code, item?.disabled)[0]}
+                                                                checked={findInselectedarray(c_data.value, item.value, item?.disabled)[0]}
                                                                 className='NSI-select-menuitem-checkbox'
                                                                 disabled={item?.disabled}
                                                             /><div>{item.name}</div>

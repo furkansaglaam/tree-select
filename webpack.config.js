@@ -7,7 +7,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, "/dist"),
     filename: "index.js",
-    library: "multi-nested-select",
+    library: "deka-tree-select",
     libraryTarget: "umd",
     umdNamedDefine: true,
   },
