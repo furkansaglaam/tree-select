@@ -1,35 +1,32 @@
-export var data = (arrayDefault, showContinent) => {
-  var finalArray = [
-    {
-      name: 'furkan',
-      value: 123,
-      subData: [
-        {
-          name: "aaa",
-          value: 111
-        },
-        {
-          name: "bbb",
-          value: "222"
-        }
-      ]
-    },
-    {
-      name: 'okan',
-      value: 12223,
-      subData: [
-        {
-          name: "ccc",
-          value: 444
-        },
-        {
-          name: "ddd",
-          value: "555"
-        }
-      ]
+export var Countries = (arrayDefault, showContinent) => {
+  var finalArray = [];
+  if (showContinent !== true) {
+    if (arrayDefault?.length > 0) {
+      finalArray = arrayDefault;
+    } else {
+      finalArray = [];
     }
-  ];
-
+  } else {
+    if (arrayDefault?.length > 0) {
+      arrayDefault?.forEach((element) => {
+        const dObj = { name: element?.continent, countries: [element] };
+        finalArray.push(dObj);
+      });
+      const result = finalArray.reduce((acc, { name, countries }) => {
+        acc[name] = acc[name] ? acc[name] : { name: name, countries: [] };
+        if (Array.isArray(countries))
+          // if it's array type then concat
+          acc[name].countries = acc[name].countries.concat(countries);
+        else acc[name].value.push(countries);
+        return acc;
+      }, {});
+      finalArray = Object.values(result);
+    } else {
+      finalArray = [];
+    }
+  }
+  finalArray.sort((a, b) => (a.name > b.name ? 1 : -1));
+  //finalArray.forEach(item => item?.zones?.sort((a,b) => a.name > b.name ? 1: -1));
 
   return finalArray;
-}
+};
